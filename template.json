@@ -1,0 +1,36 @@
+{
+  "builders": [
+    {
+      "type": "googlecompute",
+      "project_id": "XXXX-XXXXXXX-2XXXX6",
+      "source_image_family": "rocky-linux-8",
+      "zone": "us-east1-b",
+      "machine_type": "n1-standard-1",
+      "image_name": "packer-image-{{timestamp}}",
+      "ssh_username": "packer",
+      "disk_size": 20,
+      "image_family": "rocky-linux-8-v20250610",
+      "service_account_email": "bankapp-sa@XXXX-XXXXXXX-2XXXX6.iam.gserviceaccount.com"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./target/bankapp-0.0.1-SNAPSHOT.jar",
+      "destination": "/tmp/bankapp.jar"
+    },
+    {
+      "type": "shell",
+      "inline": [
+              "sudo mkdir /opt/bankapp",
+              "sudo cp /tmp/bankapp.jar /opt/bankapp/bankapp.jar",
+              "sudo yum install -y google-cloud-cli-gke-gcloud-auth-plugin vim zip unzip wget git java-17*",
+              "echo JAVA_HOME=\"/usr/lib/jvm/java-17-openjdk-17.0.16.0.8-2.el8.x86_64\" | sudo tee -a /etc/profile",
+              "echo PATH='\"$PATH:$JAVA_HOME/bin\"' | sudo tee -a /etc/profile",
+              "curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
+              "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
+              "sudo systemctl status google-cloud-ops-agent"
+      ]
+    }
+  ]
+}
