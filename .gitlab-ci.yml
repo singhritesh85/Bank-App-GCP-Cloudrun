@@ -27,6 +27,8 @@ docker_image:
     - mvn clean install
   script:
     - docker build -t $REPO_NAME/$IMAGE_NAME:$TAG_NUMBER -f Dockerfile-Project-1 .
+    - trivy image --exit-code 0 --severity MEDIUM,HIGH $REPO_NAME/$IMAGE_NAME:$TAG_NUMBER
+#    - trivy image --exit-code 1 --severity CRITICAL $REPO_NAME/$IMAGE_NAME:$TAG_NUMBER
     - docker push $REPO_NAME/$IMAGE_NAME:$TAG_NUMBER
   dependencies:
     - build_job
